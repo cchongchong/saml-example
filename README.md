@@ -1,1 +1,1 @@
-# saml-example
+# .NET Framework version example of how to issuing SAML2.0 token and consuming it
