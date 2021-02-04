@@ -1,11 +1,10 @@
-﻿using Microsoft.IdentityModel.Logging;
-using Microsoft.IdentityModel.Protocols.WsFederation;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Security.WsFederation;
 using Newtonsoft.Json;
 using Owin;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
@@ -17,9 +16,9 @@ namespace SamlConsumer
     {
         public void Configuration(IAppBuilder app)
         {
-            IdentityModelEventSource.ShowPII = true;
             var issuer = "https://localhost:44365/";
             var signingCertificate = new X509Certificate2(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "local-hosting.cer"));
+            var decryptionCertificate = new X509Certificate2(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "local-hosting.pfx"), "test", X509KeyStorageFlags.Exportable);
             var replyToUrl = "https://localhost:44356/";
             var realmUrl = "https://localhost:44356/";
 
@@ -34,6 +33,10 @@ namespace SamlConsumer
                 Issuer = issuer
             };
             wsFederationAuthenticationOptions.Configuration.SigningKeys.Add(new X509SecurityKey(signingCertificate));
+            wsFederationAuthenticationOptions.TokenValidationParameters.ClientDecryptionTokens = new System.Collections.ObjectModel.ReadOnlyCollection<SecurityToken>(new List<SecurityToken>
+            {
+                new X509SecurityToken(decryptionCertificate)
+            });
             app.UseWsFederationAuthentication(wsFederationAuthenticationOptions);
 
             app.Run(context =>
@@ -43,8 +46,6 @@ namespace SamlConsumer
             });
         }
     }
-
-
 
     public class SerializablePrincipal
     {

@@ -18,8 +18,8 @@ namespace SamlIssuer
             {
                 var replyToUrl = "https://localhost:44356/";
                 var realmUrl = "https://localhost:44356/";
-                var signingCertificate = new X509Certificate2(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "local-hosting.pfx"), "test");//or use GetLocalCertificate() to get it from local machine
-                X509Certificate2 encryptionCertificate = null;//assign it to protect the token body
+                var signingCertificate = new X509Certificate2(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "local-hosting.pfx"), "test", X509KeyStorageFlags.Exportable);//or use GetLocalCertificate() to get it from local machine
+                X509Certificate2 encryptionCertificate = signingCertificate;//assign it to protect the token body
 
                 var securityTokenHandlerCollectionManager = SecurityTokenHandlerCollectionManager.CreateEmptySecurityTokenHandlerCollectionManager();
                 securityTokenHandlerCollectionManager[SecurityTokenHandlerCollectionManager.Usage.Default] = CreateSupportedSecurityTokenHandler();
